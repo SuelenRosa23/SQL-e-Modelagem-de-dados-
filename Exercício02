@@ -1,0 +1,131 @@
+CREATE DATABASE exercicio02;
+ USE exercicio02;
+ CREATE TABLE clientes(
+ Id_Clientes 	INT 			AUTO_INCREMENT PRIMARY KEY,
+ Nome 			VARCHAR(100)	NOT NULL,
+ Tel			VARCHAR(20));
+ 
+ CREATE TABLE veiculos(
+ Id_Veiculos	INT				AUTO_INCREMENT PRIMARY KEY,
+ Modelo			VARCHAR(20)		NOT NULL,
+ Placa			VARCHAR(10)		UNIQUE NOT NULL,
+ id_clientes	INT				NOT NULL,
+ FOREIGN KEY (Id_Clientes) REFERENCES Clientes(Id_Clientes));
+ 
+ CREATE TABLE mecanicos(
+ Id_Mecanicos	INT				AUTO_INCREMENT PRIMARY KEY,
+ Nome			VARCHAR(100)	NOT NULL,
+ Especialidade	VARCHAR(50)		NOT NULL);
+ 
+CREATE TABLE servicos(
+Id_Servicos		INT				AUTO_INCREMENT PRIMARY KEY,
+Descricao		VARCHAR(100)    NOT NULL,
+Data_Servico	DATE			NOT NULL,
+Valor			DECIMAL(10,2)	NOT NULL,
+id_veiculo 		INT 			NOT NULL,
+id_mecanico 	INT				NOT NULL,
+    FOREIGN KEY (id_veiculo) REFERENCES Veiculos(Id_Veiculos),
+    FOREIGN KEY (id_mecanico) REFERENCES Mecanicos(Id_Mecanicos)
+);
+
+
+INSERT INTO clientes(nome, tel) VALUES
+('Bruno Francisco', '21987358651'),
+('Suelen Rosa' , '21974262127'),
+('Vitoria Rosa' , '219874265845');
+
+INSERT INTO veiculos(modelo, placa, id_clientes) VALUES
+('hb20', 'HGF1425', 2),
+('nirvus', 'TGD4578', 1),
+('onix', 'IJH7412', 3),
+('hondafit', 'SRS2306', 2);
+
+INSERT INTO mecanicos(nome, especialidade) VALUES
+('Joao', 'Eletrica'),
+('Carlos', 'Suspensao'),
+('Pablo', 'Motor');
+
+INSERT INTO servicos(descricao, data_servico, valor, Id_Veiculo, Id_Mecanico) VALUES
+('Troca de suspensao', '2025-01-12', 800.00, 3, 2),
+('Revisao Eletrica', '2025-10-15', 200.00, 2, 1),
+('Troca de óleo', '2025-06-10', 600.00, 4, 3),
+('Troca de bateria', '2025-04-20', 750.00, 2, 1);
+
+
+-- Liste todos os veículos com o nome do cliente dono.
+SELECT c.nome, v.placa, v.modelo AS modelo 
+FROM veiculos v
+JOIN Clientes c ON v.Id_Clientes = c.Id_Clientes;
+
+-- Liste todos os serviços realizados, mostrando o veículo, o cliente e o mecânico responsável
+SELECT 
+    s.Id_Servicos AS ID_Servico,
+    s.Descricao AS Servico,
+    s.Data_Servico AS Data,
+    s.Valor AS Valor,
+    v.Modelo AS Veiculo,
+    v.Placa AS Placa,
+    c.Nome AS Cliente,
+    m.Nome AS Mecanico,
+    m.Especialidade AS Especialidade
+FROM servicos s
+JOIN veiculos v ON s.id_veiculo = v.Id_Veiculos
+JOIN clientes c ON v.Id_Clientes = c.Id_Clientes
+JOIN mecanicos m ON s.id_mecanico = m.Id_Mecanicos
+ORDER BY s.Id_Servicos;
+
+-- Liste os serviços realizados por um mecanico especifico (exemplo, Carlos)
+SELECT 
+    s.Id_Servicos AS ID_Servico,
+    s.Descricao AS Servico,
+    s.Data_Servico AS Data,
+    s.Valor AS Valor,
+    v.Modelo AS Veiculo,
+    v.Placa AS Placa,
+    c.Nome AS Cliente,
+    m.Nome AS Mecanico
+FROM servicos s
+JOIN veiculos v ON s.id_veiculo = v.Id_Veiculos
+JOIN clientes c ON v.Id_Clientes = c.Id_Clientes
+JOIN mecanicos m ON s.id_mecanico = m.Id_Mecanicos
+WHERE m.Nome = 'Carlos'
+ORDER BY s.Data_Servico;
+
+-- Mostre todos os veículos que já realizaram serviços acima de R$500.00
+SELECT 
+    v.Modelo,
+    v.Placa,
+    c.Nome AS Nome_Cliente,
+    s.Descricao AS Servico,
+    s.Valor,
+    s.Data_Servico
+FROM servicos s
+JOIN veiculos v ON s.Id_Veiculo = v.Id_Veiculos
+JOIN clientes c ON v.Id_Clientes = c.Id_Clientes
+WHERE s.Valor > 500.00;
+
+-- Crie uma VIEW chamada vw_servicos_realizados que mostre: 
+# Nome do cliente 
+# Modelo do veículo 
+# Descrição do serviço 
+# Mecânico responsável 
+# Valor e data do serviço 
+
+CREATE VIEW vw_servicos_realizados AS
+SELECT
+    c.Nome AS Nome_Cliente,
+    v.Modelo AS Modelo_Veiculo,
+    s.Descricao AS Descricao_Servico,
+    m.Nome AS Mecanico_Responsavel,
+    s.Valor,
+    s.Data_Servico
+FROM servicos s
+JOIN veiculos v ON s.Id_Veiculo = v.Id_Veiculos
+JOIN clientes c ON v.Id_Clientes = c.Id_Clientes
+JOIN mecanicos m ON s.Id_Mecanico = m.Id_Mecanicos;
+
+-- Faça uma consulta na view retornando apenas os serviços realizados por “Suelen” (cliente) ordenados pela data do serviço.
+SELECT *
+FROM vw_servicos_realizados
+WHERE Nome_Cliente = 'Suelen Rosa'
+ORDER BY Data_Servico;
