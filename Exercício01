@@ -1,0 +1,54 @@
+CREATE DATABASE exercicio01;
+USE exercicio01;
+CREATE TABLE funcionário(
+Id				INT PRIMARY KEY 	AUTO_INCREMENT,
+Nome			VARCHAR(100) 		NOT NULL,
+Cpf 			VARCHAR(11)			NOT NULL,
+Matricula		VARCHAR(10)			NOT NULL,
+DataAdmissao	DATE);
+INSERT INTO funcionário(Nome, Cpf, Matricula, DataAdmissao)  VALUES
+('Ana Silva', '12345678901', 'MAT001', '2022-01-10'),
+('Bruno Souza', '23456789012', 'MAT002', '2022-02-15'),
+('Carla Mendes', '34567890123', 'MAT003', '2022-03-20'),
+('Diego Lima', '45678901234', 'MAT004', '2022-04-25'),
+('Fernanda Alves', '56789012345', 'MAT005', '2022-05-30');
+
+DELETE FROM funcionário
+WHERE Id = 4;
+
+
+SELECT * FROM funcionário 
+ORDER BY DataAdmissao DESC;
+
+SELECT * FROM funcionário
+WHERE Nome LIKE 'a%';
+
+SELECT * FROM funcionário
+WHERE Nome LIKE 'a%' OR 'p%';
+
+SELECT * FROM funcionário
+WHERE DataAdmissao BETWEEN '01-01-2025' AND '31-01-2025';
+
+
+SELECT * FROM funcionário
+WHERE matricula IN ('1234');
+
+SELECT * FROM funcionário 
+WHERE NOT Nome = 'Ana Silva'; 
+
+UPDATE funcionário 
+SET DataAdmissao = '2025-02-15'
+WHERE Id = 6;
+
+UPDATE funcionário 
+SET Cpf = '12498290702' , Matricula = 'MAT0005'
+WHERE Id = 5;
+
+SELECT 
+Id AS Id_funcionario,
+Nome AS Nome_funcionario,
+Cpf AS Cpf_funcionario,
+Matricula AS Matricula_funcionario,
+DataAdmissao AS Data_Admissao_funcionario
+FROM funcionário f
+WHERE DataAdmissao >= 2025-10-01;
